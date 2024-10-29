@@ -1,0 +1,7 @@
+{
+    "name": "ChatGPT",
+    "authors": ["@alilotfi"],
+    "description": "Query ChatGPT via OpenAI API.",
+    "license": "MIT",
+    "url": "https://github.com/albertlauncher/plugins/tree/main/chatgpt"
+}
