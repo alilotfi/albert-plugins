@@ -22,8 +22,8 @@ public:
 
 private:
     static bool shouldAsk(const QString& question);
-    std::pair<QString, QString> ask(QString question);
-    std::shared_ptr<albert::Item> buildHint();
+    std::pair<QString, QString> ask(const QString& question);
+    static std::shared_ptr<albert::Item> buildHint();
     static std::vector<std::shared_ptr<albert::Item>> buildItems(const QString& title, const QString& answer);
     QString iconPath;
     static const QStringList icon_urls;

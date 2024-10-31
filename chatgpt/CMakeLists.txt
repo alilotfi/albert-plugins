@@ -3,5 +3,5 @@ find_package(Albert REQUIRED)
 project(chatgpt VERSION 0.1)
 
 albert_plugin(
-    QT Widgets
+    QT Network Widgets
 )

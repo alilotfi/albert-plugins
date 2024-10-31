@@ -1,6 +1,14 @@
-// Copyright (c) 2023-2024 Manuel Schneider
+#include <QNetworkReply>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QUrl>
+#include <QDebug>
 
 #include "plugin.h"
+
+#include <QNetworkAccessManager>
+
 #include "ui_configwidget.h"
 #include <QSettings>
 #include <QThread>
@@ -18,8 +26,11 @@ namespace
     const char* DEF_OPEN_AI_MODEL = "gpt-4o-mini";
     const char* CFG_PROMPT = "PROMPT";
     const char* DEF_PROMPT =
-        "Your response must have a very short title, separated by a new line from the answer to the question. "
-        "The answer should be very concise and straight to the point, with no extra explanation or long descriptions. "
+        "Your response must have two parts. A title and an answer."
+        "The title should be very short, answering the question in at most 10 words, "
+        "separated by a new line from a more complete answer to the question. "
+        "The answer should still be very concise and straight to the point, with no extra explanation or long "
+        "descriptions, and it should not contain any new lines. "
         "With that in mind, respond to this:";
 }
 
@@ -90,7 +101,7 @@ void Plugin::handleTriggerQuery(Query* query)
         return;
     }
 
-        auto [title, answer] = ask(question);
+    auto [title, answer] = ask(question);
     if (!query->isValid())
         return;
 
@@ -104,12 +115,6 @@ bool Plugin::shouldAsk(const QString& question)
 {
     // Return true if last character of question is a question mark
     return question.right(1) == "?";
-}
-
-std::pair<QString, QString> Plugin::ask(QString question)
-{
-    this_thread::sleep_for(chrono::milliseconds(100));
-    return std::pair("title", question);
 }
 
 std::shared_ptr<albert::Item> Plugin::buildHint()
@@ -154,4 +159,44 @@ std::vector<std::shared_ptr<Item>> Plugin::buildItems(const QString& title, cons
         )
     );
     return items;
+}
+
+std::pair<QString, QString> Plugin::ask(const QString& question)
+{
+    const auto s = settings();
+    QNetworkAccessManager manager;
+    QNetworkRequest request(QUrl("https://api.openai.com/v1/chat/completions"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    const auto authorization = "Bearer " + s->value(CFG_OPEN_AI_KEY).toString();
+    request.setRawHeader("Authorization", authorization.toUtf8());
+
+    QJsonObject json;
+    json["model"] = s->value(CFG_OPEN_AI_MODEL, DEF_OPEN_AI_MODEL).toString();
+    auto messageText = s->value(CFG_PROMPT, DEF_PROMPT).toString() + R"( """)" + question + R"(""")";
+    QJsonObject message;
+    message["role"] = "user";
+    message["content"] = messageText;
+    json["messages"] = QJsonArray{message};
+    const QJsonDocument jsonDoc(json);
+
+    QNetworkReply* reply = manager.post(request, jsonDoc.toJson());
+
+    QEventLoop loop;
+    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    loop.exec();
+
+    if (reply->error() != QNetworkReply::NoError)
+    {
+        WARN << reply->errorString();
+        return {"Error", reply->errorString()};
+    }
+
+    const QByteArray response = reply->readAll();
+    const QJsonDocument responseJson = QJsonDocument::fromJson(response);
+    const QString responseContent = responseJson.object()["choices"].toArray().first().toObject()["message"].
+        toObject()["content"].toString();
+    QStringList lines = responseContent.split('\n');
+    QString title = lines.first();
+    QString answer = lines.last();
+    return {title, answer};
 }
