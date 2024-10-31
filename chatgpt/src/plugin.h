@@ -14,7 +14,6 @@ class Plugin : public albert::ExtensionPlugin,
 public:
 
     Plugin();
-
     QString defaultTrigger() const override;
     QString synopsis() const override;
     void handleTriggerQuery(albert::Query*) override;
@@ -22,8 +21,10 @@ public:
     QWidget* buildConfigWidget() override;
 
 private:
-
+    static bool shouldAsk(const QString& question);
+    std::pair<QString, QString> ask(QString question);
+    std::shared_ptr<albert::Item> buildHint();
+    static std::vector<std::shared_ptr<albert::Item>> buildItems(const QString& title, const QString& answer);
     QString iconPath;
     static const QStringList icon_urls;
-
 };

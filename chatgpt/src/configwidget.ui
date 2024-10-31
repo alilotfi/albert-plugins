@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>323</width>
-    <height>201</height>
+    <height>240</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -50,6 +50,28 @@ Use the global handler for basic queries or the trigger handler for full capabil
        </property>
       </widget>
      </item>
+     <item row="0" column="1">
+      <widget class="QPlainTextEdit" name="apiKeyTextEdit">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="baseSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="documentTitle">
+        <string notr="true"/>
+       </property>
+       <property name="plainText">
+        <string notr="true"/>
+       </property>
+      </widget>
+     </item>
      <item row="2" column="0">
       <widget class="QLabel" name="modelLabel">
        <property name="text">
@@ -64,8 +86,34 @@ Use the global handler for basic queries or the trigger handler for full capabil
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="apiKeyLineEdit"/>
+     <item row="3" column="0">
+      <widget class="QLabel" name="promptLabel">
+       <property name="text">
+        <string>prompt</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QPlainTextEdit" name="promptTextEdit">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="baseSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="documentTitle">
+        <string notr="true"/>
+       </property>
+       <property name="plainText">
+        <string notr="true"/>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
